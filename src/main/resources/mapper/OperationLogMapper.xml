@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.carrental.mapper.OperationLogMapper">
+
+    <resultMap id="OperationLogResultMap" type="com.carrental.entity.OperationLog">
+        <id property="id" column="id"/>
+        <result property="adminId" column="admin_id"/>
+        <result property="module" column="module"/>
+        <result property="operation" column="operation"/>
+        <result property="requestMethod" column="request_method"/>
+        <result property="requestUrl" column="request_url"/>
+        <result property="requestParams" column="request_params"/>
+        <result property="ip" column="ip"/>
+        <result property="createTime" column="create_time"/>
+        <result property="adminName" column="real_name"/>
+    </resultMap>
+
+    <select id="selectLogPage" resultMap="OperationLogResultMap">
+        SELECT ol.*, su.real_name
+        FROM operation_log ol
+        LEFT JOIN sys_user su ON ol.admin_id = su.id
+        <if test="adminName != null and adminName != ''">
+            WHERE su.real_name LIKE CONCAT('%', #{adminName}, '%')
+        </if>
+        <if test="module != null and module != ''">
+            <where>
+                <if test="adminName != null and adminName != ''">AND</if>
+                ol.module LIKE CONCAT('%', #{module}, '%')
+            </where>
+        </if>
+        ORDER BY ol.create_time DESC
+    </select>
+
+</mapper>
